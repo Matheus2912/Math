@@ -1,0 +1,19 @@
+/* O Código abaixo é um exemplo de como criar um horímetro de um acionamento usando SQL.
+A tabela usada no exemplo salva o horário em que os estados do equipamento em questão são alterados. O código então faz a diferença entre a hora em que 
+o equipamento ligou e em que ele desligou e salva em outra coluna.
+- Desenvolvido por Matheus Henrique Lopes */
+
+
+
+SELECT TOP(100) [Coluna de datahora em que houve a variação do estado],
+IIF([Coluna do estado do equipamento] = 1 or CONVERT(FLOAT, LAG([Coluna de datahora em que houve a variação do estado], 1,0) OVER (ORDER BY [Coluna de datahora em que houve a variação do estado])) = 0, 0, [Coluna de datahora em que houve a variação do estado] - LAG([Coluna de datahora em que houve a variação do estado], 1,0) OVER (ORDER BY [Coluna de datahora em que houve a variação do estado])) AS Horimetro,
+[Coluna a mostrar o estado do equipamento]
+FROM [Tabela] 
+
+
+
+/* Explicando o código:
+A função LAG retorna o valor contido nas linhas anteriores a atual, podendo ser uma ou mais linhas anteriores.
+No exemplo é criado uma nova coluna calculada onde é subtraído os valores da coluna datahora da nova coluna com os valores de datahora de uma linha anterior.
+Esses valores são salvos caso o estado do equipamento seja 0 ou desligado. Quando o status do equipamento é 1 ou ligado, o valor da nova coluna passa a ser 0.
+Para saber o total trabalhado em um determinado período de tempo, basta fazer uma soma dessa nova coluna [Horimetro], dentro do período desejado */
